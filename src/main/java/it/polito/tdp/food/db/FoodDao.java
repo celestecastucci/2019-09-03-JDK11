@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import it.polito.tdp.food.model.Adiacenza;
 import it.polito.tdp.food.model.Condiment;
 import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Portion;
@@ -107,6 +110,68 @@ public class FoodDao {
 			return null ;
 		}
 
+	}
+	
+	
+	//vertici senza idMap
+	public List<String> getVertici(int calorie){
+		
+		String sql="SELECT distinct p.portion_display_name AS portion_name "
+				+ "FROM `portion` p "
+				+ "WHERE p.calories < ? ";
+		
+		List<String> result = new LinkedList<String>();
+		try {
+			Connection conn = DBConnect.getConnection() ;
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			st.setInt(1, calorie);
+	
+			ResultSet res = st.executeQuery() ;
+			
+			while(res.next()) {
+				result.add(res.getString("portion_name"));
+				
+			}
+			
+			conn.close();
+			return result ;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null ;
+		}
+
+	}
+	
+	
+	
+	//archi
+	public List<Adiacenza> getAdiacenze(){
+		String sql="SELECT p1.portion_display_name AS name_p1, p2.portion_display_name AS name_p2, COUNT(DISTINCT p1.food_code) AS peso "
+				+ "FROM `portion` p1, `portion` p2 "
+				+ "WHERE p1.portion_id <> p2.portion_id AND p1.food_code=p2.food_code "
+				+ "GROUP BY p1.portion_display_name, p2.portion_display_name ";
+		List<Adiacenza> result = new LinkedList<Adiacenza>();
+		try {
+			Connection conn = DBConnect.getConnection() ;
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			ResultSet res = st.executeQuery() ;
+			
+			while(res.next()) {
+				if(res.getDouble("peso")!=0){
+				Adiacenza a= new Adiacenza(res.getString("name_p1"), res.getString("name_p2"), res.getDouble("peso"));
+				result.add(a);
+				}	
+			}
+			
+			conn.close();
+			return result ;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null ;
+		}
+		
 	}
 	
 	
