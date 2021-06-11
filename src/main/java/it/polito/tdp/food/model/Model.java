@@ -66,7 +66,7 @@ public class Model {
 	
 	// RICORSIONE
 	public List<String> trovaPercorso(String partenza, int N){
-		this.percorsoMigliore=null;
+		this.percorsoMigliore=new ArrayList<String>();
 		this.pesoMigliore=0.0;
 		List<String> parziale = new ArrayList<String>();
 		parziale.add(partenza);
